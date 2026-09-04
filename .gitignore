@@ -2,28 +2,126 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-# 下载目录
-downloads/
-
-# 虚拟环境
-venv/
-env/
-.env/
-
-# 编译文件
-dist/
+*.so
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
 *.spec
 
-# IDE文件
-.idea/
-.vscode/
-*.swp
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# 日志文件
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
 *.log
+local_settings.py
 
-# 系统文件
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Log files
+*.log
+p2pfile.log
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# FRP临时配置
+/tmp/p2pfile/
+
+# 配置文件目录（用户需要手动创建配置文件）
+config/
+
+# Build output
+dist/
+build/

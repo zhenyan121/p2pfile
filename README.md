@@ -44,8 +44,13 @@ frp (Fast Reverse Proxy) 是一个高性能的反向代理应用，可以帮助�
 ## 环境要求
 - FRP服务器 v0.52.3 及以上
 - Python 3.8+ 环境
-- Windows 10/11 操作系统
+- **操作系统**：Windows 10/11 或 Linux
 - 至少2GB可用内存
+
+### FRP客户端要求
+- **Windows**: 需要 `frpc.exe` 文件
+- **Linux**: 需要 `frpc` 可执行文件
+- 请将对应的FRP客户端文件放在 `src/` 目录下
 
 ## 使用说明
 
@@ -137,28 +142,107 @@ auth.token = your_secure_token
 3. 启动frps：`frps -c frps.ini`
 
 ## 使用方法
-### 客户端配置
-1. 编辑`src/main.py`中的配置参数：
-```python
-server_addr = "frp.yourdomain.com"  # 服务器公网IP/域名
-server_port = 7000
-token = "your_secure_token"
-```
 
-### 安装步骤
+### 客户端配置
+
+1. **准备配置文件**：
+   - 在项目根目录下的 `config/` 目录中创建配置文件：
+    - **发送端配置文件** `config/frpc_server.toml`：
+      ```toml
+      serverAddr = "your-frp-server-domain.com"
+      serverPort = 7000
+      auth.token = "your-secure-token"
+
+      # xtcp P2P模式（首选）
+      [[proxies]]
+      name = "p2pfile_xtcp"
+      type = "xtcp"
+      secretKey = "p2pfiletransfer"
+      localIP = "127.0.0.1"
+      localPort = 7100
+
+      # stcp 安全隧道模式（fallback）
+      [[proxies]]
+      name = "p2pfile_stcp"
+      type = "stcp"
+      secretKey = "p2pfiletransfer"
+      localIP = "127.0.0.1"
+      localPort = 7100
+      ```
+
+    - **接收端配置文件** `config/frpc_visitor.toml`：
+      ```toml
+      serverAddr = "your-frp-server-domain.com"
+      serverPort = 7000
+      auth.token = "your-secure-token"
+
+      # xtcp P2P模式（首选）
+      [[visitors]]
+      name = "p2pfile_xtcp_visitor"
+      type = "xtcp"
+      serverName = "p2pfile_xtcp"
+      secretKey = "p2pfiletransfer"
+      bindAddr = "127.0.0.1"
+      bindPort = 7102
+
+      # stcp 安全隧道模式（fallback）
+      [[visitors]]
+      name = "p2pfile_stcp_visitor"
+      type = "stcp"
+      serverName = "p2pfile_stcp"
+      secretKey = "p2pfiletransfer"
+      bindAddr = "127.0.0.1"
+      bindPort = 7103
+      ```
+
+2. **修改配置文件**：
+   - 修改以下参数：
+     - `serverAddr`: 你的FRP服务器地址
+     - `serverPort`: FRP服务器端口（默认7000）
+     - `auth.token`: FRP服务器认证令牌
+     - `secretKey`: P2P连接密钥（双方必须相同）
 
 ### 使用流程
 
-1. 双方都启动应用程序并连接到frp服务器
-2. 发送方选择要传输的文件
-3. 接收方确认接收
-4. 开始传输，界面显示传输进度和速度
-5. 传输完成后自动校验文件完整性
+1. **配置准备**：
+   - 在项目根目录创建 `config/` 目录
+   - 发送端：创建 `config/frpc_server.toml` 并填入发送端配置
+   - 接收端：创建 `config/frpc_visitor.toml` 并填入接收端配置
+
+2. **启动程序**：
+   - 双方都启动应用程序
+   - 程序会自动读取对应的配置文件
+
+3. **建立连接**：
+   - 程序会自动连接到frp服务器并尝试建立P2P连接
+
+4. **传输文件**：
+   - 发送方选择要传输的文件
+   - 接收方确认接收
+   - 开始传输，界面显示传输进度和速度
+   - 传输完成后自动校验文件完整性
+
+## 连接模式说明
+
+### xtcp P2P模式（首选）
+- **工作原理**：通过UDP打洞建立点对点直连
+- **优势**：数据传输不经过服务器，速度快
+- **限制**：成功率取决于NAT类型，Full-Cone NAT成功率最高
+
+### stcp 安全隧道模式（fallback）
+- **工作原理**：通过服务器中转数据
+- **优势**：连接成功率100%，不受NAT类型限制
+- **限制**：数据传输经过服务器，速度受服务器带宽限制
+
+### 自动fallback机制
+- 程序会优先尝试xtcp P2P连接
+- 如果30秒内无法建立P2P连接，自动切换到stcp模式
+- 无需用户干预，自动完成切换
 
 ## 注意事项
 
 - xtcp模式的成功率取决于NAT类型，Full-Cone NAT类型成功率最高
-- 如果无法建立P2P连接，可以考虑使用stcp模式作为备选
+- stcp模式作为fallback，确保连接成功率100%
 - 大文件传输时请确保磁盘有足够空间
 - 传输过程中请勿关闭程序，否则需要从断点处重新传输
 
